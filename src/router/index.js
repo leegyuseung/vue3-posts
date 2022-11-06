@@ -1,4 +1,8 @@
-import { createRouter, createWebHistory } from "vue-router";
+import {
+  createRouter,
+  // createWebHashHistory,
+  createWebHistory,
+} from "vue-router";
 import HomeView from "@/views/HomeView.vue";
 import AboutView from "@/views/AboutView.vue";
 import PostCreateView from "@/views/posts/PostCreateView.vue";
@@ -77,7 +81,8 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHistory("/"),
+  history: createWebHistory("/"), // 기본적인 url 경로를 나타냄
+  // history: createWebHashHistory(), // #이붙음
   routes,
 });
 
