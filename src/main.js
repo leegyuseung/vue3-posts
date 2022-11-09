@@ -7,3 +7,13 @@ import router from "@/router";
 createApp(App).use(router).mount("#app");
 
 import "bootstrap/dist/js/bootstrap.js";
+
+// 어떤 모드인지 출력
+console.log("MODE:", import.meta.env.MODE);
+console.log("MODE:", import.meta.env.BASE_URL);
+// Production모드이면 true
+console.log("MODE:", import.meta.env.PROD);
+// Dev 모드면 true
+console.log("MODE:", import.meta.env.DEV);
+
+console.log("VITE_APP_API_URL", import.meta.env.VITE_APP_API_URL);
