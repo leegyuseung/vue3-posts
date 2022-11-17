@@ -6,7 +6,10 @@ import router from "@/router";
 import funcPlugins from "./plugins/func";
 import objPlugins from "./plugins/obj";
 import person from "./plugins/person";
+import globalComponents from "@/plugins/global-components";
+
 const app = createApp(App);
+app.use(globalComponents);
 app.use(objPlugins, { name: "lee" });
 app.use(funcPlugins);
 app.use(person, { name: "홍길동" });

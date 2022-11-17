@@ -24,9 +24,6 @@ export default {
 </script>
 
 <script setup>
-import AppCard from "@/components/AppCard.vue";
-import AppGrid from "@/components/AppGrid.vue";
-
 import { inject, ref } from "vue";
 import { useRouter } from "vue-router";
 
