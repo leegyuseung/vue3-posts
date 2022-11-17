@@ -6,16 +6,18 @@ import router from "@/router";
 import funcPlugins from "./plugins/func";
 import objPlugins from "./plugins/obj";
 import person from "./plugins/person";
-import globalComponents from "@/plugins/global-components";
+// import globalComponents from "@/plugins/global-components";
+// import focus from "./directives/focus";
+import globalDirectives from "./plugins/global-directives";
 
 const app = createApp(App);
-app.use(globalComponents);
+// app.use(globalComponents);
 app.use(objPlugins, { name: "lee" });
 app.use(funcPlugins);
 app.use(person, { name: "홍길동" });
 app.use(router);
 app.mount("#app");
-
+// app.directive("focus", focus);
 import "bootstrap/dist/js/bootstrap.js";
 
 // 어떤 모드인지 출력
