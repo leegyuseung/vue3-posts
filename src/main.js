@@ -3,21 +3,24 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import { createApp } from "vue";
 import App from "./App.vue";
 import router from "@/router";
-import funcPlugins from "./plugins/func";
-import objPlugins from "./plugins/obj";
-import person from "./plugins/person";
+// import funcPlugins from "./plugins/func";
+// import objPlugins from "./plugins/obj";
+// import person from "./plugins/person";
 // import globalComponents from "@/plugins/global-components";
 // import focus from "./directives/focus";
 import globalDirectives from "./plugins/global-directives";
+import dayjs from "./plugins/dayjs";
 
 const app = createApp(App);
 // app.use(globalComponents);
-app.use(objPlugins, { name: "lee" });
-app.use(funcPlugins);
-app.use(person, { name: "홍길동" });
-app.use(router);
-app.mount("#app");
 // app.directive("focus", focus);
+app.use(router);
+app.use(globalDirectives);
+app.use(dayjs);
+// app.use(objPlugins, { name: "lee" });
+// app.use(funcPlugins);
+// app.use(person, { name: "홍길동" });
+app.mount("#app");
 import "bootstrap/dist/js/bootstrap.js";
 
 // 어떤 모드인지 출력
