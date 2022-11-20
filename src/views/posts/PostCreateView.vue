@@ -2,6 +2,7 @@
   <div>
     <h2 @click="visibleForm = !visibleForm">게시글등록</h2>
     <hr class="my-4" />
+    <app-error v-if="error" :message="error.message" />
     <PostForm
       v-if="visibleForm"
       v-model:title="form.title"
@@ -13,6 +14,18 @@
           목록
         </button>
         <button class="btn btn-primary">저장</button>
+
+        <button class="btn btn-primary" :disabled="loading">
+          <template v-if="loading">
+            <span
+              class="spinner-grow spinner-grow-sm"
+              role="status"
+              aria-hidden="true"
+            ></span>
+            <span class="visually-hidden">Loading...</span>
+          </template>
+          <template v-else>저장</template>
+        </button>
       </template>
     </PostForm>
   </div>
@@ -36,17 +49,22 @@ const goListPage = () => {
   router.push({ name: "PostList" });
 };
 const visibleForm = ref(true);
-const save = () => {
+const loading = ref(false);
+const error = ref(null);
+const save = async () => {
   try {
-    createPost({
+    loading.value = true;
+    await createPost({
       ...form.value,
       createdAt: Date.now(),
     });
-    // router.push({ name: "PostList" });
+    router.push({ name: "PostList" });
     vSuccess("등록이 완료되었습니다.");
-  } catch (error) {
-    console.error(error);
-    vAlert(error.message);
+  } catch (err) {
+    vAlert(err.message);
+    error.value = err;
+  } finally {
+    loading.value = false;
   }
 };
 </script>

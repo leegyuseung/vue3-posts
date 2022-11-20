@@ -1,11 +1,16 @@
 <template>
-  <div>
+  <app-loading v-if="loading" />
+
+  <app-error v-else-if="error" :message="error.message" />
+
+  <div v-else>
     <h2>{{ post.title }}</h2>
     <p>{{ post.content }}</p>
     <p class="text-muted">
       {{ $dayjs(post.createdAt).format("YYYY. MM. DD HH:mm:ss") }}
     </p>
     <hr class="my-4" />
+    <app-error v-if="removeError" :message="removeError.message" />
     <div class="row g-2">
       <div class="col-auto">
         <button class="btn btn-outline-dark">이전글</button>
@@ -23,7 +28,22 @@
         </button>
       </div>
       <div class="col-auto">
-        <button class="btn btn-outline-danger" @click="remove">삭제</button>
+        <button
+          class="btn btn-outline-danger"
+          @click="remove"
+          :disabled="removeLoading"
+        >
+          <template v-if="removeLoading">
+            <span
+              class="spinner-grow spinner-grow-sm"
+              role="status"
+              aria-hidden="true"
+            ></span>
+            <span class="visually-hidden">Loading...</span>
+          </template>
+          <template v-else>삭제</template>
+        </button>
+        <button class="btn btn-primary"></button>
       </div>
     </div>
   </div>
@@ -33,7 +53,9 @@
 import { deletePost, getPostById } from "@/api/posts";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { useAlert } from "@/composables/alert";
 
+const { vAlert, vSuccess } = useAlert();
 const props = defineProps({
   id: [String, Number],
 });
@@ -43,14 +65,23 @@ const router = useRouter();
 ref 장점) 객체할당을 할 수 있다. 일관성 단점) .value 로 접근해야한다.
 reactive 장점) .value로 접근할 필요 없다. 단점) 객체할당 불가능 하나씩 입력해주어야한다.
 */
-const post = ref({});
+const post = ref({
+  title: null,
+  content: null,
+  createdAt: null,
+});
+const error = ref(null);
+const loading = ref(false);
 
 const fetchPost = async () => {
   try {
+    loading.value = true;
     const { data } = await getPostById(props.id);
     setPost(data);
   } catch (err) {
-    console.error(err);
+    error.value = err;
+  } finally {
+    loading.value = false;
   }
 };
 const setPost = ({ title, content, createdAt }) => {
@@ -60,14 +91,23 @@ const setPost = ({ title, content, createdAt }) => {
 };
 
 fetchPost();
+
+const removeError = ref(null);
+const removeLoading = ref(false);
 const remove = async () => {
   try {
     if (confirm("삭제 하시겠습니까?")) {
-      await deletePost(props.id);
-      router.push({ name: "PostList" });
+      return;
     }
+    removeLoading.value = true;
+    await deletePost(props.id);
+    vSuccess("삭제가 완료되었습니다.");
+    router.push({ name: "PostList" });
   } catch (err) {
-    console.error(err);
+    vAlert(err.message);
+    removeError.value = err;
+  } finally {
+    removeLoading.value = false;
   }
 };
 const goListPage = () => router.push({ name: "PostList" });
