@@ -32,11 +32,12 @@
 </template>
 
 <script setup>
-import { createPost } from "@/api/posts";
+// import { createPost } from "@/api/posts";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import PostForm from "@/components/posts/PostForm.vue";
 import { useAlert } from "@/composables/alert";
+import { useAxios } from "@/hooks/useAxios";
 
 const { vAlert, vSuccess } = useAlert();
 
@@ -49,24 +50,41 @@ const goListPage = () => {
   router.push({ name: "PostList" });
 };
 const visibleForm = ref(true);
-const loading = ref(false);
-const error = ref(null);
-const save = async () => {
-  try {
-    loading.value = true;
-    await createPost({
-      ...form.value,
-      createdAt: Date.now(),
-    });
-    router.push({ name: "PostList" });
-    vSuccess("등록이 완료되었습니다.");
-  } catch (err) {
-    vAlert(err.message);
-    error.value = err;
-  } finally {
-    loading.value = false;
+const { error, loading, execute } = useAxios(
+  "/posts",
+  {
+    methods: "post",
+  },
+  {
+    immediate: false,
+    onSuccess: () => {
+      router.push({ name: "PostList" });
+      vSuccess("등록이 완료되었습니다.");
+    },
+    onError: (err) => {
+      vAlert(err.message);
+    },
   }
+);
+const save = async () => {
+  execute({ ...form.value, createdAt: Date.now() });
 };
+// const save = async () => {
+//   try {
+//     loading.value = true;
+//     await createPost({
+//       ...form.value,
+//       createdAt: Date.now(),
+//     });
+//     router.push({ name: "PostList" });
+//     vSuccess("등록이 완료되었습니다.");
+//   } catch (err) {
+//     vAlert(err.message);
+//     error.value = err;
+//   } finally {
+//     loading.value = false;
+//   }
+// };
 </script>
 
 <style lang="scss" scoped></style>

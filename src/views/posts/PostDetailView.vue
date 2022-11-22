@@ -50,10 +50,11 @@
 </template>
 
 <script setup>
-import { deletePost, getPostById } from "@/api/posts";
+import { deletePost } from "@/api/posts";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useAlert } from "@/composables/alert";
+import { useAxios } from "@/hooks/useAxios";
 
 const { vAlert, vSuccess } = useAlert();
 const props = defineProps({
@@ -61,55 +62,39 @@ const props = defineProps({
 });
 
 const router = useRouter();
-/* 
+/*
 ref 장점) 객체할당을 할 수 있다. 일관성 단점) .value 로 접근해야한다.
 reactive 장점) .value로 접근할 필요 없다. 단점) 객체할당 불가능 하나씩 입력해주어야한다.
 */
-const post = ref({
-  title: null,
-  content: null,
-  createdAt: null,
-});
-const error = ref(null);
-const loading = ref(false);
 
-const fetchPost = async () => {
-  try {
-    loading.value = true;
-    const { data } = await getPostById(props.id);
-    setPost(data);
-  } catch (err) {
-    error.value = err;
-  } finally {
-    loading.value = false;
+const { error, loading, data: post } = useAxios(`/posts/${props.id}`);
+
+const {
+  error: removeError,
+  loading: removeLoading,
+  execute,
+} = useAxios(
+  `/posts/${props.id}`,
+  { method: "delete" },
+  {
+    immediate: false,
+    onSuccess: () => {
+      vSuccess("삭제가 완료되었습니다.");
+      router.push({ name: "PostList" });
+    },
+    onError: (err) => {
+      vAlert(err.message);
+    },
   }
-};
-const setPost = ({ title, content, createdAt }) => {
-  post.value.title = title;
-  post.value.content = content;
-  post.value.createdAt = createdAt;
-};
+);
 
-fetchPost();
-
-const removeError = ref(null);
-const removeLoading = ref(false);
 const remove = async () => {
-  try {
-    if (confirm("삭제 하시겠습니까?")) {
-      return;
-    }
-    removeLoading.value = true;
-    await deletePost(props.id);
-    vSuccess("삭제가 완료되었습니다.");
-    router.push({ name: "PostList" });
-  } catch (err) {
-    vAlert(err.message);
-    removeError.value = err;
-  } finally {
-    removeLoading.value = false;
+  if (confirm("삭제 하시겠습니까?")) {
+    return;
   }
+  execute();
 };
+
 const goListPage = () => router.push({ name: "PostList" });
 const goEditPage = () =>
   router.push({ name: "PostEdit", params: { id: props.id } });
