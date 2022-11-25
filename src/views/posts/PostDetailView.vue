@@ -5,6 +5,7 @@
 
   <div v-else>
     <h2>{{ post.title }}</h2>
+    <p>id: {{ props.id }}, isOdd:{{ isOdd }}</p>
     <p>{{ post.content }}</p>
     <p class="text-muted">
       {{ $dayjs(post.createdAt).format("YYYY. MM. DD HH:mm:ss") }}
@@ -50,11 +51,11 @@
 </template>
 
 <script setup>
-import { deletePost } from "@/api/posts";
-import { ref } from "vue";
+import { computed, toRefs } from "vue";
 import { useRouter } from "vue-router";
 import { useAlert } from "@/composables/alert";
 import { useAxios } from "@/hooks/useAxios";
+import { useNumber } from "@/composables/number";
 
 const { vAlert, vSuccess } = useAlert();
 const props = defineProps({
@@ -62,12 +63,14 @@ const props = defineProps({
 });
 
 const router = useRouter();
+const { id: idRef } = toRefs(props);
+const { isOdd } = useNumber(idRef);
 /*
 ref 장점) 객체할당을 할 수 있다. 일관성 단점) .value 로 접근해야한다.
 reactive 장점) .value로 접근할 필요 없다. 단점) 객체할당 불가능 하나씩 입력해주어야한다.
 */
-
-const { error, loading, data: post } = useAxios(`/posts/${props.id}`);
+const url = computed(() => `/posts/${props.id}`);
+const { error, loading, data: post } = useAxios(url);
 
 const {
   error: removeError,
